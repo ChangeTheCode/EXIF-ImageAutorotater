@@ -34,7 +34,12 @@ namespace AutoRotate.Image.Console
             var fileTypes = new List<string>{"*.jpg", "*.png", "*.jpge"};
             
             _ImageLogic = new ImageRotateLogic();
-            _ImageLogic.RotateImages(path, fileTypes);
+            //_ImageLogic.RotateImages(path, fileTypes);
+
+            using(var cts = new System.Threading.CancellationTokenSource(TimeSpan.FromMinutes(20)))
+            {
+                _ImageLogic.RotateImagesParallelAsync(path, fileTypes, cts.Token);
+            }
 
             System.Console.WriteLine("Rotate of the give directory '" + path + "'was successful. "+ DateTime.Now.ToString());
             System.Console.WriteLine("Press any key to exit ..." );

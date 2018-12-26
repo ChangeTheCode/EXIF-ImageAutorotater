@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Drawing;
 using System.IO;
 using System.Drawing.Imaging;
+using System.Threading;
 
 namespace AutoRotate.Image.Logic
 {
@@ -17,33 +18,55 @@ namespace AutoRotate.Image.Logic
 
             foreach (var item in allFilesInDirectory)
             {
-                if (File.Exists(item))
+                RotateImage(item);
+            }
+        }
+
+        public void RotateImagesParallel(string directoryName, IReadOnlyCollection<string> fileFilterOptions, CancellationToken token)
+        {
+            var allFilesInDirectory = LoadAllFilesWithFiterOptions(directoryName, fileFilterOptions);
+
+            var taskPool = new List<Task>();
+
+            foreach (var oneImagePath in allFilesInDirectory)
+            {
+                var singleTask = Task.Factory.StartNew(() => RotateImage(oneImagePath));
+
+                taskPool.Add(singleTask);
+            }
+
+            Task.WaitAll(taskPool.ToArray(), token);
+        }
+
+        private void RotateImage(string itemFilePath)
+        {
+            if (File.Exists(itemFilePath))
+            {
+                using (MemoryStream inMemoryCopy = new MemoryStream())
                 {
-                    using (MemoryStream inMemoryCopy = new MemoryStream())
+                    using (FileStream fs = File.OpenRead(itemFilePath))
                     {
-                        using (FileStream fs = File.OpenRead(item))
-                        {
-                            fs.CopyTo(inMemoryCopy);
-                        }
+                        fs.CopyTo(inMemoryCopy);
+                    }
 
-                        try
+                    try
+                    {
+                        using (var bit = new Bitmap(inMemoryCopy))
                         {
-                            using (var bit = new Bitmap(inMemoryCopy))
-                            {
-                                bit.ExifRotate();
+                            bit.ExifRotate();
 
-                                bit.Save(item);
-                            }
+                            bit.Save(itemFilePath);
                         }
-                        catch (Exception e)
-                        {
-                            RestoreImageByFail(item, inMemoryCopy);
-                            Console.WriteLine("Image was resotred: " + e.Message + " " + e.StackTrace);
-                        }
+                    }
+                    catch (Exception e)
+                    {
+                        RestoreImageByFail(itemFilePath, inMemoryCopy);
+                        Console.WriteLine("Image was resotred: " + e.Message + " " + e.StackTrace);
                     }
                 }
             }
         }
+        
 
         private void RestoreImageByFail(string fullFileName, MemoryStream fileStream)
         {
