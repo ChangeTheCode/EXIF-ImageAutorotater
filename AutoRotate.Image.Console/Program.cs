@@ -38,7 +38,7 @@ namespace AutoRotate.Image.Console
 
             using(var cts = new System.Threading.CancellationTokenSource(TimeSpan.FromMinutes(20)))
             {
-                _ImageLogic.RotateImagesParallelAsync(path, fileTypes, cts.Token);
+                _ImageLogic.RotateImagesParallel(path, fileTypes, cts.Token);
             }
 
             System.Console.WriteLine("Rotate of the give directory '" + path + "'was successful. "+ DateTime.Now.ToString());
