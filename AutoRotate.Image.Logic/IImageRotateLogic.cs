@@ -12,5 +12,6 @@ namespace AutoRotate.Image.Logic
         void RotateImages(string directoryName, IReadOnlyCollection<string> fileFilterOptions);
 
         void RotateImagesParallel(string directoryName, IReadOnlyCollection<string> fileFilterOptions, CancellationToken token);
+        void RotateImagesParallel(string directoryName, int taskCount,IReadOnlyCollection<string> fileFilterOptions, CancellationToken token);
     }
 }

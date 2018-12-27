@@ -38,6 +38,56 @@ namespace AutoRotate.Image.Logic
             Task.WaitAll(taskPool.ToArray(), token);
         }
 
+        /// <summary>
+        /// Will rotate the images in parallel, you can decide how many task should run in parallel 
+        /// </summary>
+        /// <param name="directoryName">path of the directory</param>
+        /// <param name="taskCount">count of the task which should run in prallel</param>
+        /// <param name="fileFilterOptions">which file type (ending of file e.g. *.jpg) should rotated</param>
+        /// <param name="token">Cancellation token</param>
+        public void RotateImagesParallel(string directoryName, int taskCount, IReadOnlyCollection<string> fileFilterOptions, CancellationToken token)
+        {
+            var allFilesInDirectory = LoadAllFilesWithFiterOptions(directoryName, fileFilterOptions).ToList();
+
+            var filesPerTask = SplitFilesForEachTask(taskCount, allFilesInDirectory);
+
+            var taskPool = new List<Task>();
+
+            foreach (var files in filesPerTask)
+            {
+                var singleTask = Task.Factory.StartNew(() => RotateMulitpleImages(files));
+                taskPool.Add(singleTask);
+            }
+
+            Task.WaitAll(taskPool.ToArray(), token);
+        }
+
+        //TODO move this function to a class e.g. TaskManager -> inject via interface 
+        private List<List<string>> SplitFilesForEachTask(int taskCount, List<string> allFilesInDirectory)
+        {
+            int sizeOfEachSplitList = allFilesInDirectory.Count / taskCount;
+
+            var listOfLists = new List<List<string>>();
+
+            for(int i = 0; i < taskCount; i++)
+            {
+                var newList = new List<string>();
+
+                newList.AddRange(allFilesInDirectory.GetRange(i * sizeOfEachSplitList, sizeOfEachSplitList +1 ));
+                listOfLists.Add(newList);    
+            }
+            
+            return listOfLists;
+        }
+
+        private void RotateMulitpleImages(List<string> images)
+        {
+            foreach (var item in images)
+            {
+                RotateImage(item);
+            }
+        }
+
         private void RotateImage(string itemFilePath)
         {
             if (File.Exists(itemFilePath))
