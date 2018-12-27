@@ -8,6 +8,8 @@ Also it is able to run this application as a console application via the command
 ## Setup
 Read me to add **image rotater** to the context menu (manuelly)
 
+![image info](./Documentation/ContextMenuEntry.png)
+
 1. Start the regedit.exe
 > Open start and type "regedit.exe and start this application 
 2. Navigate to "HKEY_CLASSES_ROOT\directory\shell
