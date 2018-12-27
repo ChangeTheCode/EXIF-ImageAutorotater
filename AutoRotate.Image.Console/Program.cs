@@ -1,5 +1,6 @@
 ﻿using AutoRotate.Image.Logic;
 using System;
+using System.Configuration;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,6 +13,10 @@ namespace AutoRotate.Image.Console
     class Program
     {
         private static IImageRotateLogic _ImageLogic;
+
+        // TODO handle if the given path is a picture instead of a directory 
+        // make testable 
+        // move defintion of the supported image types to app.config like -> <add key="ClientsFilePath" value="filepath"/>
 
         static void Main(string[] args)
         {
@@ -30,15 +35,21 @@ namespace AutoRotate.Image.Console
                 return;
             }
 
-            // TODO move to app.config 
-            var fileTypes = new List<string>{"*.jpg", "*.png", "*.jpge"};
+            // TODO add check 
+            var fileTypes = ConfigurationManager.AppSettings["File.Types"].Split(';').ToList();
+            int countOfTaskToCreate = 1;
+            int.TryParse(ConfigurationManager.AppSettings["Task.CountOfParallelTasks"], out countOfTaskToCreate);
+
             
             _ImageLogic = new ImageRotateLogic();
             //_ImageLogic.RotateImages(path, fileTypes);
 
             using(var cts = new System.Threading.CancellationTokenSource(TimeSpan.FromMinutes(20)))
             {
-                _ImageLogic.RotateImagesParallel(path, fileTypes, cts.Token);
+                //_ImageLogic.RotateImagesParallel(path, fileTypes, cts.Token);
+
+                // run with defined task count 
+                _ImageLogic.RotateImagesParallel(path, countOfTaskToCreate, fileTypes, cts.Token);
             }
 
             System.Console.WriteLine("Rotate of the give directory '" + path + "'was successful. "+ DateTime.Now.ToString());
