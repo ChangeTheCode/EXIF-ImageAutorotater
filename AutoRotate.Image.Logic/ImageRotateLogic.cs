@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Drawing;
 using System.IO;
 using System.Drawing.Imaging;
+using System.Windows.Media.Imaging;
 using System.Threading;
 
 namespace AutoRotate.Image.Logic
@@ -18,7 +19,14 @@ namespace AutoRotate.Image.Logic
 
             foreach (var item in allFilesInDirectory)
             {
-                RotateImage(item);
+                try
+                {
+                    RotateImage(item);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Something went wrong. No changes at this image: " + e.Message + " " + e.StackTrace);
+                }
             }
         }
 
@@ -90,40 +98,56 @@ namespace AutoRotate.Image.Logic
 
         private void RotateImage(string itemFilePath)
         {
-            if (File.Exists(itemFilePath))
+            Rotation rotation;
+            using(var bmp = new Bitmap(itemFilePath))
             {
-                using (MemoryStream inMemoryCopy = new MemoryStream())
+                rotation = ImageExtensions.GetRotation(bmp);
+            }
+
+            RotateJpeg(itemFilePath, rotation);
+        }
+
+        private void RotateJpeg(string filePath, Rotation rotation,  int quality = 100)
+        {
+            var original = new FileInfo(filePath);
+            var temp = new FileInfo(original.FullName.Replace(".", "_temp."));
+
+            const BitmapCreateOptions createOptions = BitmapCreateOptions.PreservePixelFormat | BitmapCreateOptions.IgnoreColorProfile;
+
+            try
+            {
+                using (Stream originalFileStream = File.Open(original.FullName, FileMode.Open, FileAccess.Read))
                 {
-                    using (FileStream fs = File.OpenRead(itemFilePath))
-                    {
-                        fs.CopyTo(inMemoryCopy);
-                    }
+                    JpegBitmapEncoder encoder = new JpegBitmapEncoder { QualityLevel = quality, Rotation = rotation };
 
-                    try
-                    {
-                        using (var bit = new Bitmap(inMemoryCopy))
-                        {
-                            bit.ExifRotate();
+                    //BitmapCreateOptions.PreservePixelFormat | BitmapCreateOptions.IgnoreColorProfile and BitmapCacheOption.None
+                    //is a KEY to lossless jpeg edit if the QualityLevel is the same
+                    encoder.Frames.Add(BitmapFrame.Create(originalFileStream, createOptions, BitmapCacheOption.None));
 
-                            bit.Save(itemFilePath);
-                        }
-                    }
-                    catch (Exception e)
+                    using (Stream newFileStream = File.Open(temp.FullName, FileMode.Create, FileAccess.ReadWrite))
                     {
-                        RestoreImageByFail(itemFilePath, inMemoryCopy);
-                        Console.WriteLine("Image was resotred: " + e.Message + " " + e.StackTrace);
+                        encoder.Save(newFileStream);
                     }
                 }
             }
-        }
-        
-
-        private void RestoreImageByFail(string fullFileName, MemoryStream fileStream)
-        {
-            using (var image = System.Drawing.Bitmap.FromStream(fileStream))
+            catch (Exception)
             {
-                image.Save(fullFileName, ImageFormat.Jpeg);
+                throw;
             }
+
+            try
+            {
+                temp.CreationTime = original.CreationTime;
+
+                original.Delete();
+                temp.MoveTo(original.FullName);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+
+            return;
         }
 
         private IReadOnlyCollection<string> LoadAllFilesWithFiterOptions(string directory, IReadOnlyCollection<string> fileFilterOptions)
