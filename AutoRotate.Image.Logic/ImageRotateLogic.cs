@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
 using System.IO;
 using System.Drawing.Imaging;
-using System.Windows.Media.Imaging;
 using System.Threading;
 
 namespace AutoRotate.Image.Logic
@@ -56,56 +53,23 @@ namespace AutoRotate.Image.Logic
 
         private void RotateImage(string itemFilePath)
         {
-            Rotation rotation;
+            RotateFlipType rotationType;
             using(var bmp = new Bitmap(itemFilePath))
             {
-                rotation = ImageExtensions.GetRotation(bmp);
+                rotationType = ImageExtensions.GetRotation(bmp);
             }
 
-            RotateJpeg(itemFilePath, rotation);
+            RotateJpeg(itemFilePath, rotationType);
         }
 
-        private void RotateJpeg(string filePath, Rotation rotation,  int quality = 100)
-        {
-            var original = new FileInfo(filePath);
-            var temp = new FileInfo(original.FullName.Replace(".", "_temp."));
+        private void RotateJpeg(string filePath, RotateFlipType rotationType,  int quality = 100)
+        {         
+            var image = Bitmap.FromFile(filePath);
 
-            const BitmapCreateOptions createOptions = BitmapCreateOptions.PreservePixelFormat | BitmapCreateOptions.IgnoreColorProfile;
+            image.RotateFlip(rotationType);
+            image.Save(filePath, ImageFormat.Jpeg); // TODO make it the file extension type dynamic 
 
-            try
-            {
-                using (Stream originalFileStream = File.Open(original.FullName, FileMode.Open, FileAccess.Read))
-                {
-                    JpegBitmapEncoder encoder = new JpegBitmapEncoder { QualityLevel = quality, Rotation = rotation };
-
-                    //BitmapCreateOptions.PreservePixelFormat | BitmapCreateOptions.IgnoreColorProfile and BitmapCacheOption.None
-                    //is a KEY to lossless jpeg edit if the QualityLevel is the same
-                    encoder.Frames.Add(BitmapFrame.Create(originalFileStream, createOptions, BitmapCacheOption.None));
-
-                    using (Stream newFileStream = File.Open(temp.FullName, FileMode.Create, FileAccess.ReadWrite))
-                    {
-                        encoder.Save(newFileStream);
-                    }
-                }
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-
-            try
-            {
-                temp.CreationTime = original.CreationTime;
-
-                original.Delete();
-                temp.MoveTo(original.FullName);
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-
-            return;
+            
         }
 
         private IReadOnlyCollection<string> LoadAllFilesWithFiterOptions(string directory, IReadOnlyCollection<string> fileFilterOptions)
@@ -113,7 +77,7 @@ namespace AutoRotate.Image.Logic
             var listOfAllFiles = new List<string>();
             foreach (var filesTypes in fileFilterOptions)
             {
-                listOfAllFiles.AddRange(System.IO.Directory.GetFiles(directory, filesTypes));
+                listOfAllFiles.AddRange(Directory.GetFiles(directory, filesTypes));
             }
 
             return listOfAllFiles;

@@ -1,40 +1,36 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Drawing;
-using System.IO;
-using System.Windows.Media.Imaging;
 
 namespace AutoRotate.Image.Logic
 {
     public static class ImageExtensions
     {
+            
         private const int exifOrientationID = 0x112; //274
 
-        public static Rotation GetRotation(Bitmap img)
+        public static RotateFlipType GetRotation(Bitmap img)
         {
             // if this image contains exif information then figure out which case it is
             if (img.PropertyIdList.Contains(exifOrientationID))
             {
                 var prop = img.GetPropertyItem(exifOrientationID);
                 int val = BitConverter.ToUInt16(prop.Value, 0);
-                
+
                 if (val == 3 || val == 4)
                 {
-                    return Rotation.Rotate180;
+                    return RotateFlipType.Rotate180FlipNone;
                 }
                 else if (val == 5 || val == 6)
                 {
-                    return Rotation.Rotate90;
+                    return RotateFlipType.Rotate90FlipNone;
                 }
                 else if (val == 7 || val == 8)
                 {
-                    return Rotation.Rotate270;
+                    return RotateFlipType.Rotate270FlipNone;
                 }
             }
-            return Rotation.Rotate0;
+            return RotateFlipType.RotateNoneFlipNone;
         }
 
         public static void ExifRotate(this System.Drawing.Image img)
