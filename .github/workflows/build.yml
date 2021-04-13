@@ -24,8 +24,6 @@ jobs:
  
     - name: Build and Publish Web App
       run: msbuild AutoRotate.Image.sln /p:Configuration=Release /p:DeployOnBuild=true /p:PublishProfile=FolderProfile
-
-    - run: mkdir -p bin\Release
     
     - name: Upload Artifact
       uses: actions/upload-artifact@v1.0.0
