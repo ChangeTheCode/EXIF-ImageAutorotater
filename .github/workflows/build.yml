@@ -1,4 +1,4 @@
-name: Build EXIF-ImageAutorotater 
+name: Build-EXIF-ImageAutorotater 
  
 on: [push]
  
