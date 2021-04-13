@@ -68,8 +68,7 @@ namespace AutoRotate.Image.Logic
 
             image.RotateFlip(rotationType);
             image.Save(filePath, ImageFormat.Jpeg); // TODO make it the file extension type dynamic 
-
-            
+            image.Dispose();
         }
 
         private IReadOnlyCollection<string> LoadAllFilesWithFiterOptions(string directory, IReadOnlyCollection<string> fileFilterOptions)
