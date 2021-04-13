@@ -1,6 +1,6 @@
 # Image Rotate tool
 
-[![Actions Status](https://github.com/ChangeTheCode/EXIF-ImageAutorotater/actions/workflows/Build/badge.svg)](https://github.com/ChangeTheCode/EXIF-ImageAutorotater/actions)
+[![Actions Status](https://github.com/ChangeTheCode/EXIF-ImageAutorotater/workflows/Build/badge.svg)](https://github.com/ChangeTheCode/EXIF-ImageAutorotater/actions)
 
 
 This application will rotate all your images in the given directory. So you do not need that anymore by hand. 
