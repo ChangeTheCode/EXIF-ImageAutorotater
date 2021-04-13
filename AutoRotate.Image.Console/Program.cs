@@ -1,11 +1,7 @@
 ﻿using AutoRotate.Image.Logic;
 using System;
 using System.Configuration;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Drawing;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
@@ -50,7 +46,7 @@ namespace AutoRotate.Image.Console
 
             var path = args.FirstOrDefault<string>();
 
-            if (! System.IO.Directory.Exists(path))
+            if (!Directory.Exists(path))
             {
                 System.Console.WriteLine("No give directory does not exist " + path);
                 System.Console.ReadLine();
