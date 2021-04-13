@@ -12,7 +12,7 @@ jobs:
       name: Checkout Code
      
     - name: Setup MSBuild Path
-      uses: changethecode/Setup-MSBuild@v1
+      uses: microsoft/setup-msbuild@2008f912f56e61277eefaac6d1888b750582aa16
        
     - name: Setup NuGet
       uses: NuGet/setup-nuget@v1.0.2
