@@ -1,35 +1,33 @@
-name: Build-EXIF-ImageAutorotater 
- 
+name: Build-EXIF-ImageAutorotater
+
 on: [push]
- 
+
 jobs:
   build:
- 
     runs-on: windows-latest
     env:
       ACTIONS_ALLOW_UNSECURE_COMMANDS: true
- 
+
     steps:
-    - uses: actions/checkout@v1
-      name: Checkout Code
-     
-    - name: Setup MSBuild Path
-      uses: microsoft/setup-msbuild@2008f912f56e61277eefaac6d1888b750582aa16
-       
-    - name: Setup NuGet
-      uses: NuGet/setup-nuget@v1.0.2
-     
-    - name: Restore NuGet Packages
-      run: nuget restore AutoRotate.Image.sln
- 
-    - name: Build and Publish Web App
-      run: msbuild AutoRotate.Image.sln /p:Configuration=Release /p:DeployOnBuild=true /p:PublishProfile=FolderProfile
-    
-    - name: Upload Artifact
-      uses: actions/upload-artifact@v1.0.0
-      with:
-        name: EXIF-ImageAutorotater 
-        path: |
-          AutoRotate.Image.Console/bin/release
-          Setup/
-      
+      - uses: actions/checkout@v1
+        name: Checkout Code
+
+      - name: Setup MSBuild Path
+        uses: microsoft/setup-msbuild@2008f912f56e61277eefaac6d1888b750582aa16
+
+      - name: Setup NuGet
+        uses: NuGet/setup-nuget@v1.0.2
+
+      - name: Restore NuGet Packages
+        run: nuget restore AutoRotate.Image.sln
+
+      - name: Build and Publish Web App
+        run: msbuild AutoRotate.Image.sln /p:Configuration=Release /p:DeployOnBuild=true /p:PublishProfile=FolderProfile
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v1.0.0
+        with:
+          name: EXIF-ImageAutorotater
+          path: |
+            AutoRotate.Image.Console/bin/release
+            Setup
