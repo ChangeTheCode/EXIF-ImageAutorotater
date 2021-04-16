@@ -26,17 +26,9 @@ jobs:
 
       - run: mkdir -p output
 
-      - name: copy file programm
-        uses: canastro/copy-file-action@master
-        with:
-          source: "AutoRotate.Image.Console/bin/release"
-          target: "output"
-
-      - name: copy file setup
-        uses: canastro/copy-file-action@master
-        with:
-          source: "Setup"
-          target: "output/setup"
+      - run: copy AutoRotate.Image.Console/bin/release output
+    
+      - run: copy Setup "output/setup"
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v1.0.0
