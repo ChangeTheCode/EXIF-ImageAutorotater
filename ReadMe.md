@@ -18,6 +18,7 @@ Read me to add **image rotater** to the context menu (manually)
 There is a powershell script which you can use to set the regestry entry (you may have to executed it as admin) script is stored `Setup\Install.ps1`. If you do not longer want to have this entry in your regestry you can remove it by using the `Setup\Remove.ps1` script.
 
 - [Install script](.\Setup\Install.ps1)
+  > run following command in powershell `\Setup\Install.ps1 -path "Path to application\AutoRotate.Image.Console.exe"`
 - [Remove script](.\Setup\Remove.ps1)
 
 ### Manual setup
