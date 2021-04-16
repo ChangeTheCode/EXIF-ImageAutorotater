@@ -28,6 +28,10 @@ jobs:
         uses: actions/upload-artifact@v1.0.0
         with:
           name: EXIF-ImageAutorotater
-          path: 
-            AutoRotate.Image.Console/bin/release;
-            Setup;
+          path: AutoRotate.Image.Console/bin/release
+
+      - name: Upload Setup Artifact
+        uses: actions/upload-artifact@v1.0.0
+        with:
+          name: EXIF-ImageAutorotater-Setup
+          path: Setup
