@@ -29,5 +29,6 @@ jobs:
         with:
           name: EXIF-ImageAutorotater
           path: |
-            AutoRotate.Image.Console/bin/release
-            Setup
+            path/output/bin/
+            path/output/test-results
+            !path/**/*.tmp
