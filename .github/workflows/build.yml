@@ -24,14 +24,22 @@ jobs:
       - name: Build and Publish Web App
         run: msbuild AutoRotate.Image.sln /p:Configuration=Release /p:DeployOnBuild=true /p:PublishProfile=FolderProfile
 
+      - run: mkdir -p output
+
+      - name: copy file programm
+        uses: canastro/copy-file-action@master
+        with:
+          source: "AutoRotate.Image.Console/bin/release"
+          target: "output"
+
+      - name: copy file setup
+        uses: canastro/copy-file-action@master
+        with:
+          source: "Setup"
+          target: "output/setup"
+
       - name: Upload Artifact
         uses: actions/upload-artifact@v1.0.0
         with:
           name: EXIF-ImageAutorotater
-          path: AutoRotate.Image.Console/bin/release
-
-      - name: Upload Setup Artifact
-        uses: actions/upload-artifact@v1.0.0
-        with:
-          name: EXIF-ImageAutorotater-Setup
-          path: Setup
+          path: "output"
