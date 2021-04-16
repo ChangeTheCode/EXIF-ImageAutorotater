@@ -26,12 +26,12 @@ jobs:
 
       - run: mkdir -p output
 
-      - run: copy AutoRotate.Image.Console/bin/release output
+      - run: copy AutoRotate.Image.Console/bin/release /output
     
-      - run: copy Setup output/setup
+      - run: copy Setup /output/setup
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v1.0.0
         with:
           name: EXIF-ImageAutorotater
-          path: output
+          path: /output
